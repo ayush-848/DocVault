@@ -1,9 +1,9 @@
 const supabase = require('../utils/supabaseClient');
 const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
-const detectLanguage = require('../utils/languageDetector');
+const { detectLanguage } = await import('../utils/languageDetector.mjs');
 const pdfParse = require('pdf-parse');
-const fetch = require('node-fetch'); // If not already available
+const fetch = require('node-fetch'); 
 
 const MAX_STORAGE_MB = 500;
 
