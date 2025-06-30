@@ -1,8 +1,8 @@
-const { detect } = require('langdetect');
+import { franc } from 'franc';
 
 function detectLanguage(text) {
-  const langCode = detect(text);
+  const langCode = franc(text);
   return langCode === 'und' ? 'unknown' : langCode;
 }
 
-module.exports = detectLanguage;
+export default detectLanguage;
