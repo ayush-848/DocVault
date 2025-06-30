@@ -2,6 +2,7 @@ const supabase = require('../utils/supabaseClient');
 const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 
+const { Readable } = require('stream');
 const pdfParse = require('pdf-parse');
 const MAX_STORAGE_MB = 500;
 
@@ -124,6 +125,7 @@ exports.getDocumentsAndUsage = async (req, res) => {
   }
 };
 
+
 exports.serveDocument = async (req, res) => {
   const userId = req.user.id;
   const docId = req.params.id;
@@ -140,7 +142,6 @@ exports.serveDocument = async (req, res) => {
 
     const { supabase_key, title } = result.rows[0];
 
-    // Get the public URL (we use it server-side only)
     const { data } = supabase
       .storage
       .from(process.env.SUPABASE_BUCKET)
@@ -151,24 +152,27 @@ exports.serveDocument = async (req, res) => {
       return res.status(500).json({ message: 'Could not generate file URL' });
     }
 
-    // Fetch file from Supabase
     const fileResponse = await fetch(publicUrl);
-    if (!fileResponse.ok || !fileResponse.body) {
+    if (!fileResponse.ok) {
       return res.status(502).json({ message: 'Failed to fetch file from Supabase' });
     }
 
-    // Set headers to stream properly
     const contentType = fileResponse.headers.get('content-type') || 'application/octet-stream';
     const contentLength = fileResponse.headers.get('content-length');
 
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Length', contentLength);
+    if (contentLength) {
+      res.setHeader('Content-Length', contentLength);
+    }
     res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(title)}"`);
 
-    // Stream it
-    fileResponse.body.pipe(res);
+    // Convert ReadableStream → Node.js stream
+    const nodeStream = Readable.fromWeb(fileResponse.body);
+
+    nodeStream.pipe(res);
   } catch (err) {
     console.error('🔥 serveDocument error:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
