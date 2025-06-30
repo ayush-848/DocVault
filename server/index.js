@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors({
   origin: ['http://localhost:5173',
-  'https://doc-vault-api.vercel.app'],  // Must match frontend origin exactly
+  'https://docuflow-three.vercel.app'],  // Must match frontend origin exactly
   credentials: true                 // Allow cookies, authorization headers, etc.
 }));
 
