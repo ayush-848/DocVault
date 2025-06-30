@@ -24,6 +24,7 @@
     "langdetect": "^0.2.1",
     "pdf-parse": "^1.1.1",
     "pg": "^8.16.2",
+    "unicode-9.0.0": "^0.7.5",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
