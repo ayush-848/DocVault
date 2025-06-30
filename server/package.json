@@ -26,5 +26,8 @@
     "pdf-parse": "^1.1.1",
     "pg": "^8.16.2",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@unicode/unicode-9.0.0": "^1.6.6"
   }
 }
