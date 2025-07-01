@@ -1,33 +1,35 @@
-const express=require('express')
+const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const authRoutes=require('./routes/authRoutes')
+const authRoutes = require('./routes/authRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const pool = require('./config/db');
 const cookieParser = require('cookie-parser');
 
-dotenv.config()
+dotenv.config();
 const app = express();
+
+app.set('trust proxy', 1); // ✅ required for secure cookies in prod
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://docuflow-three.vercel.app'],
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: ['http://localhost:5173',
-  'https://docuflow-three.vercel.app'],  // Must match frontend origin exactly
-  credentials: true                 // Allow cookies, authorization headers, etc.
-}));
-
 
 const PORT = process.env.PORT || 3000;
 
 app.use('/auth', authRoutes);
 app.use('/documents', documentRoutes);
+
 app.get('/protected', authMiddleware, async (req, res) => {
   try {
     const { id } = req.user;
-
     const result = await pool.query(
       'SELECT id, username, email, created_at FROM users WHERE id = $1',
       [id]
@@ -48,10 +50,10 @@ app.get('/protected', authMiddleware, async (req, res) => {
   }
 });
 
-app.get('/',(req,res)=>{
-    res.send("HELLO")
-})
+app.get('/', (req, res) => {
+  res.send("HELLO");
+});
 
-app.listen(PORT, ()=>{
-    console.log(`Server is running on http://localhost:${PORT}`);
-})
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
