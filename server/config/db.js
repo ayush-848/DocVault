@@ -5,12 +5,13 @@ require('dotenv').config();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // Accept self-signed certs (important for Neon)
+    rejectUnauthorized: false,
   },
 });
+pool.on('error', (err) => {
+  console.error('🔥 PG Pool error:', err.message);
+});
 
-pool.connect()
-  .then(() => console.log("🟢 Connected to Database"))
-  .catch((err) => console.error("🔴 Connection error:", err));
+console.log("🟢 Database pool initialized");
 
 module.exports = pool;

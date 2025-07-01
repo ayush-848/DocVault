@@ -45,15 +45,13 @@ export default function Dashboard() {
     })
   }
 
-  const parseLanguage = (value) => {
+  const parseTitle = (title) => {
     try {
-      const parsed = JSON.parse(value)
-      if (typeof parsed === 'object') {
-        const inner = Object.keys(parsed)[0]
-        const parsedInner = JSON.parse(inner)
-        return parsedInner.lang?.toUpperCase() || 'Unknown'
+      const len=title.length
+      if (len > 25) {
+        title= `${title.slice(0, 22)}...`
       }
-      return 'Unknown'
+      return title;
     } catch {
       return 'Unknown'
     }
@@ -106,7 +104,7 @@ export default function Dashboard() {
                   key={doc.id}
                   className="bg-card p-4 border rounded-lg shadow-sm space-y-2 font-mono"
                 >
-                  <h3 className="font-bold text-lg break-words">{doc.title}</h3>
+                  <h3 className="font-bold text-lg break-words">{parseTitle(doc.title)}</h3>
 
                   {thumbnail && (
                     <div className="w-full h-44 aspect-[3/4] bg-white rounded-md overflow-hidden border">
@@ -120,7 +118,7 @@ export default function Dashboard() {
 
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p>📅 {formatDate(doc.created_at)}</p>
-                    <p>🌐 Language: {parseLanguage(doc.language)}</p>
+                    <p>🌐 Language: {(doc.language)}</p>
                     <p>💾 Size: {formatSize(doc.size || 0)}</p>
                   </div>
                   <a

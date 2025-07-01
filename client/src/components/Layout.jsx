@@ -14,7 +14,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen max-h-screen bg-background text-foreground">
       {/* Sidebar */}
       <aside className="w-64 hidden md:flex flex-col justify-between bg-muted/40 backdrop-blur-md border-r border-primary/30 p-6 shadow-sm">
         <div>
@@ -31,7 +31,7 @@ export default function Layout() {
           {/* Theme Toggle - FULL clickable */}
           <button
             onClick={toggleTheme}
-            className="w-full bg-muted px-4 py-3 rounded-lg flex items-center justify-between mb-8 border border-border hover:border-primary/50 hover:shadow transition-all"
+            className="w-full bg-muted px-4 py-3 rounded-lg cursor-pointer flex items-center justify-between mb-8 border border-border hover:border-primary/50 hover:shadow transition-all"
             aria-label="Toggle theme"
           >
             <span className="font-mono font-semibold">Mode: {theme === 'light' ? 'Light' : 'Dark'}</span>
@@ -81,7 +81,7 @@ export default function Layout() {
         <Button
           variant="destructive"
           onClick={logout}
-          className="w-full mt-8 font-mono font-semibold text-base"
+          className="w-full mt-8 font-mono cursor-pointer font-semibold text-base"
         >
           Logout
         </Button>

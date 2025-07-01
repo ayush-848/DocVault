@@ -30,6 +30,7 @@ export const uploadDoc = (formData) =>
     },
   }).then((res) => res.data);
 
+
 export const getAllDocs = () =>
   API.get('/documents')
     .then((res) => res.data)

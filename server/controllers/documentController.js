@@ -1,20 +1,14 @@
 const supabase = require('../utils/supabaseClient');
 const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
-
 const { Readable } = require('stream');
-const pdfParse = require('pdf-parse');
 const MAX_STORAGE_MB = 500;
 
-// 🟢 Upload Document
-// 🟢 Upload Document
+// 📄 Upload Document
 exports.uploadDocument = async (req, res) => {
   try {
     const file = req.file;
     if (!file) return res.status(400).json({ message: 'No file uploaded' });
-
-    // 🟢 Load language detector dynamically
-    const { detectLanguage } = await import('../utils/languageDetector.mjs');
 
     const fileExt = file.originalname.split('.').pop();
     const filename = `${uuidv4()}.${fileExt}`;
@@ -35,27 +29,14 @@ exports.uploadDocument = async (req, res) => {
       return res.status(500).json({ message: 'Upload failed', error });
     }
 
-    // Extract text if possible
-    let documentText = '';
-    if (file.mimetype === 'application/pdf') {
-      try {
-        const pdfData = await pdfParse(file.buffer);
-        documentText = pdfData.text;
-      } catch {
-        console.warn('⚠️ PDF parsing failed');
-      }
-    } else if (file.mimetype.startsWith('text/')) {
-      documentText = file.buffer.toString('utf-8');
-    }
-
-    const langCode = detectLanguage(documentText);
-    console.log(`🌐 Detected language: ${langCode}`);
+    const language = req.body.language || 'unknown';
+    console.log(`🌐 Language received from frontend: ${language}`);
 
     const result = await pool.query(
       `INSERT INTO documents (user_id, title, supabase_key, language, size)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [userId, file.originalname, filename, langCode, fileSize]
+      [userId, file.originalname, filename, language, fileSize]
     );
 
     console.log('✅ Document metadata saved');
@@ -69,7 +50,6 @@ exports.uploadDocument = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 // 📥 Fetch All Documents (with usage)
 exports.getDocumentsAndUsage = async (req, res) => {
@@ -99,8 +79,8 @@ exports.getDocumentsAndUsage = async (req, res) => {
           language: doc.language,
           created_at: doc.created_at,
           size: doc.size,
-          viewUrl: `/documents/${doc.id}/view`, // proxy/stream view
-          publicUrl, // 👈 used for thumbnails or direct embeds
+          viewUrl: `/documents/${doc.id}/view`,
+          publicUrl,
         };
       })
     );
@@ -125,7 +105,7 @@ exports.getDocumentsAndUsage = async (req, res) => {
   }
 };
 
-
+// 📄 Serve Document (stream view)
 exports.serveDocument = async (req, res) => {
   const userId = req.user.id;
   const docId = req.params.id;
@@ -166,13 +146,10 @@ exports.serveDocument = async (req, res) => {
     }
     res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(title)}"`);
 
-    // Convert ReadableStream → Node.js stream
     const nodeStream = Readable.fromWeb(fileResponse.body);
-
     nodeStream.pipe(res);
   } catch (err) {
     console.error('🔥 serveDocument error:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
