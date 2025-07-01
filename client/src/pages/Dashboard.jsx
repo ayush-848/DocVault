@@ -144,7 +144,7 @@ export default function Dashboard() {
 
                   <button
                     onClick={() => openDocument(doc.id)}
-                    className="text-blue-500 hover:underline"
+                    className="text-blue-500 hover:underline cursor-pointer"
                   >
                     View
                   </button>
