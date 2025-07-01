@@ -47,11 +47,11 @@ export default function Dashboard() {
 
   const parseTitle = (title) => {
     try {
-      const len=title.length
+      const len = title.length
       if (len > 25) {
-        title= `${title.slice(0, 22)}...`
+        title = `${title.slice(0, 22)}...`
       }
-      return title;
+      return title
     } catch {
       return 'Unknown'
     }
@@ -60,6 +60,26 @@ export default function Dashboard() {
   const formatSize = (bytes) => {
     const mb = bytes / (1024 * 1024)
     return `${mb.toFixed(2)} MB`
+  }
+
+  const openDocument = async (docId) => {
+    try {
+      const res = await fetch(api.getDocViewUrl(docId), {
+        method: 'GET',
+        credentials: 'include', // Include auth cookies
+      })
+
+      if (!res.ok) throw new Error('Failed to fetch document')
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+
+      // Open in same tab
+      window.location.href = url
+    } catch (err) {
+      console.error('❌ Failed to open document:', err)
+      alert('Unable to load document. Please try again.')
+    }
   }
 
   return (
@@ -118,19 +138,17 @@ export default function Dashboard() {
 
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p>📅 {formatDate(doc.created_at)}</p>
-                    <p>🌐 Language: {(doc.language)}</p>
+                    <p>🌐 Language: {doc.language}</p>
                     <p>💾 Size: {formatSize(doc.size || 0)}</p>
                   </div>
-                  <a
-                    href={api.getDocViewUrl(doc.id)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+
+                  <button
+                    onClick={() => openDocument(doc.id)}
                     className="text-blue-500 hover:underline"
                   >
                     View
-                  </a>
+                  </button>
                 </div>
-
               )
             })}
           </div>
