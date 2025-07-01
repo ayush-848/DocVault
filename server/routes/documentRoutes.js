@@ -16,5 +16,5 @@ router.post('/upload', authMiddleware, upload.single('file'), uploadDocument);
 // List documents + usage
 router.get('/', authMiddleware, getDocumentsAndUsage);
 
-router.get('/:id/view', serveDocument);
+router.get('/:id/view', authMiddleware, serveDocument);
 module.exports = router;
