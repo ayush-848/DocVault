@@ -76,7 +76,7 @@ export default function Login() {
               </button>
             </div>
 
-            <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
+            <Button type="submit" className="w-full cursor-pointer text-gray-200 dark:text-black" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </Button>
           </form>

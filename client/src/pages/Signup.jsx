@@ -81,7 +81,7 @@ export default function Signup() {
               </button>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full cursor-pointer text-gray-200 dark:text-black" disabled={loading}>
               {loading ? 'Registering...' : 'Register'}
             </Button>
           </form>
