@@ -1,6 +1,8 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'sonner' // ✅ import Sonner Toaster
 import { AuthProvider } from './context/AuthContext'
+
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -12,10 +14,21 @@ import PrivateRoute from './components/PrivateRoute'
 
 export default function App() {
   return (
-    <Router>
+    <AuthProvider>
+      <Router>
+        <Toaster
+  position="top-right"
+  toastOptions={{
+    className:
+      'bg-white dark:bg-zinc-900 text-black dark:text-white shadow-lg border border-border rounded-lg px-4 py-2',
+    unstyled: true,
+  }}
+  visibleToasts={5}
+/>
+
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<Home />} />                {/* Home page */}
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
@@ -29,6 +42,7 @@ export default function App() {
           {/* Catch-all */}
           <Route path="*" element={<div className="p-8">404 Not Found</div>} />
         </Routes>
-    </Router>
+      </Router>
+    </AuthProvider>
   )
 }

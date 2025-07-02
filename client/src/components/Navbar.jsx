@@ -1,6 +1,5 @@
-
 import { Button } from '@/components/ui/button'
-import { Sun, Moon,AlignLeft } from 'lucide-react'
+import { Sun, Moon, AlignLeft } from 'lucide-react'
 
 export default function Navbar({ theme, setTheme }) {
   const navigate = (path) => {
@@ -9,26 +8,26 @@ export default function Navbar({ theme, setTheme }) {
 
   return (
     <nav className="relative z-10 flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
-      <div className="flex items-center gap-2 mb-8">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <AlignLeft className="text-primary" size={20} />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight font-mono text-primary">
-              DocuFlow
-            </h1>
-          </div>
+      <a href="/" className="flex items-center gap-2">
+        <div className="p-2 bg-primary/10 rounded-lg">
+          <AlignLeft className="text-primary" size={20} />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight font-mono text-primary">
+          DocuFlow
+        </h1>
+      </a>
 
       <div className="hidden md:flex items-center gap-8 text-muted-foreground">
         <button className="text-primary transition cursor-pointer">Features</button>
-        <button className="text-primary transition cursor-pointer" onClick={()=>navigate('/dashboard')}>Dashboard</button>
+        <button className="text-primary transition cursor-pointer" onClick={() => navigate('/dashboard')}>Dashboard</button>
         <button className="text-primary transition cursor-pointer">About</button>
       </div>
 
       <div className="flex items-center gap-4">
         <ThemeToggle setTheme={setTheme} theme={theme} />
         <Button
-          className="bg-primary text-black font-semibold px-5"
-          onClick={() => navigate('/login')}
+          className="bg-primary text-black font-semibold px-5 cursor-pointer"
+          onClick={() => navigate('/signup')}
         >
           Get Started
         </Button>

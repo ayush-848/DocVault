@@ -54,6 +54,15 @@ export const createShareLink = (docId) =>
 export const getSharedDoc = (token) =>
   API.get(`/share/view/${token}`);
 
+export const deleteDoc = (docId) =>
+  API.delete(`/documents/${docId}`)
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error(`❌ Failed to delete document ${docId}:`, err);
+      throw err;
+    });
+
+
 export default {
   register,
   login,
@@ -65,4 +74,5 @@ export default {
   addTag,
   createShareLink,
   getSharedDoc,
+  deleteDoc
 };

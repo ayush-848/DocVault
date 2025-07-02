@@ -34,9 +34,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden font-mono transition-colors duration-300">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-10 z-0 pointer-events-none" />
-
       {/* Glow Effects */}
       <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-primary opacity-10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-primary opacity-10 rounded-full blur-2xl" />

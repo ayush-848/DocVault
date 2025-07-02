@@ -1,91 +1,71 @@
-import { useEffect, useState, useCallback } from 'react'
-import UploadForm from '../components/UploadForm'
-import { useAuth } from '../context/AuthContext'
-import { Progress } from '@/components/ui/progress'
-import api from '../services/api'
+// Dashboard.jsx
+import { useEffect, useState } from 'react';
+import UploadForm from '../components/UploadForm';
+import { useAuth } from '../context/AuthContext';
+import { Progress } from '@/components/ui/progress';
+import api from '../services/api';
+import DocCard from '../components/DocCard';
+import toast from '@/utils/toast';
 
 export default function Dashboard() {
-  const [docs, setDocs] = useState([])
+  const [docs, setDocs] = useState([]);
   const [storage, setStorage] = useState({
     usedMB: 0,
     remainingMB: 500,
     usagePercent: 0,
     maxMB: 500,
-  })
-  const { user } = useAuth()
+  });
 
-  const getThumioThumbnail = useCallback((doc) => {
-    if (doc?.publicUrl?.endsWith('.pdf')) {
-      const encodedUrl = doc.publicUrl
-      return `https://image.thum.io/get/pdfSource/width/400/page/1/${encodedUrl}`
+  const { user } = useAuth();
+
+  const fetchDocs = async () => {
+    try {
+      const { documents, storage } = await api.getAllDocs();
+      setDocs(documents);
+      setStorage(storage);
+    } catch (err) {
+      console.error('Error fetching documents:', err);
+      toast.error('❌ Failed to fetch documents.');
     }
-    return null
-  }, [])
+  };
 
   useEffect(() => {
-    const fetchDocs = async () => {
-      try {
-        const { documents, storage } = await api.getAllDocs()
-        setDocs(documents)
-        setStorage(storage)
-      } catch (err) {
-        console.error('Error fetching documents:', err)
-      }
-    }
-
-    fetchDocs()
-  }, [])
-
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
-  }
-
-  const parseTitle = (title) => {
-    try {
-      const len = title.length
-      if (len > 25) {
-        title = `${title.slice(0, 22)}...`
-      }
-      return title
-    } catch {
-      return 'Unknown'
-    }
-  }
-
-  const formatSize = (bytes) => {
-    const mb = bytes / (1024 * 1024)
-    return `${mb.toFixed(2)} MB`
-  }
+    fetchDocs();
+  }, []);
 
   const openDocument = async (docId) => {
     try {
       const res = await fetch(api.getDocViewUrl(docId), {
         method: 'GET',
-        credentials: 'include', // Include auth cookies
-      })
+        credentials: 'include',
+      });
 
-      if (!res.ok) throw new Error('Failed to fetch document')
+      if (!res.ok) throw new Error('Failed to fetch document');
 
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-
-      // Open in same tab
-      window.location.href = url
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.location.href = url;
     } catch (err) {
-      console.error('❌ Failed to open document:', err)
-      alert('Unable to load document. Please try again.')
+      console.error('❌ Failed to open document:', err);
+      toast.error('❌ Unable to open document. Please try again.');
     }
-  }
+  };
+
+  const deleteDocument = async (docId) => {
+    try {
+      await api.deleteDoc(docId);
+      await fetchDocs();
+      toast.success('✅ Document deleted successfully!');
+    } catch (err) {
+      console.error('❌ Failed to delete document:', err);
+      toast.error('❌ Failed to delete document. Please try again.');
+    }
+  };
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-4 sm:p-6 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight font-mono">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-mono">
           Welcome{user?.username ? `, ${user.username}` : ''} 👋
         </h1>
         <p className="text-muted-foreground text-sm mt-1 font-mono">
@@ -93,7 +73,7 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <div className="bg-card border border-border shadow-sm rounded-lg p-6 space-y-3">
+      <div className="bg-card border border-border shadow-sm rounded-lg p-4 sm:p-6 space-y-3">
         <h2 className="text-xl font-semibold font-mono">Storage Usage</h2>
         <div className="flex justify-between text-sm font-mono text-muted-foreground">
           <span>
@@ -104,9 +84,9 @@ export default function Dashboard() {
         <Progress value={storage.usagePercent} className="h-3 rounded-full" />
       </div>
 
-      <div className="bg-card border border-border shadow-sm rounded-lg p-6 space-y-4">
+      <div className="bg-card border border-border shadow-sm rounded-lg p-4 sm:p-6 space-y-4">
         <h2 className="text-xl font-semibold font-mono">Upload New Document</h2>
-        <UploadForm onDone={() => window.location.reload()} />
+        <UploadForm onDone={fetchDocs} />
       </div>
 
       <div>
@@ -117,43 +97,17 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {docs.map((doc) => {
-              const thumbnail = getThumioThumbnail(doc)
-              return (
-                <div
-                  key={doc.id}
-                  className="bg-card p-4 border rounded-lg shadow-sm space-y-2 font-mono"
-                >
-                  <h3 className="font-bold text-lg break-words">{parseTitle(doc.title)}</h3>
-
-                  {thumbnail && (
-                    <div className="w-full h-44 aspect-[3/4] bg-white rounded-md overflow-hidden border">
-                      <img
-                        src={thumbnail}
-                        alt={`Thumbnail for ${doc.title}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <p>📅 {formatDate(doc.created_at)}</p>
-                    <p>🌐 Language: {doc.language}</p>
-                    <p>💾 Size: {formatSize(doc.size || 0)}</p>
-                  </div>
-
-                  <button
-                    onClick={() => openDocument(doc.id)}
-                    className="text-blue-500 hover:underline cursor-pointer"
-                  >
-                    View
-                  </button>
-                </div>
-              )
-            })}
+            {docs.map((doc) => (
+              <DocCard
+                key={doc.id}
+                doc={doc}
+                onView={openDocument}
+                onDelete={deleteDocument}
+              />
+            ))}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

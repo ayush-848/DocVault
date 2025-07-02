@@ -1,11 +1,13 @@
+// UploadForm.jsx
 import React, { useRef, useState } from 'react';
 import { extractTextFromPDF } from '../utils/extractPdfText';
 import { detectLanguage } from '../utils/detectLanguage';
 import { uploadDoc } from '../services/api';
 import { Button } from '@/components/ui/button';
-import { UploadCloud } from 'lucide-react';
+import { UploadCloud, X } from 'lucide-react';
+import toast from '@/utils/toast';
 
-const UploadForm = () => {
+const UploadForm = ({ onDone }) => {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -14,10 +16,16 @@ const UploadForm = () => {
     setFile(e.target.files[0]);
   };
 
+  const handleClearFile = () => {
+    setFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!file || file.type !== 'application/pdf') {
-      alert('Please select a valid PDF file.');
+      toast.error('❌ Please select a valid PDF file.');
       return;
     }
 
@@ -32,24 +40,24 @@ const UploadForm = () => {
 
       const res = await uploadDoc(formData);
       console.log('✅ Uploaded Document:', res);
-      alert('✅ Document uploaded successfully!');
-      window.location.reload();
+
+      toast.success('✅ Document uploaded successfully!');
+      handleClearFile();
+      if (onDone) onDone();
     } catch (err) {
       console.error('❌ Upload failed:', err);
-      alert('❌ Upload failed. Please try again.');
+      toast.error('❌ Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current.click();
-  };
+  const triggerFileInput = () => fileInputRef.current?.click();
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-3 px-4 py-2 font-mono"
+      className="flex flex-col sm:flex-row flex-wrap items-center gap-3 font-mono"
     >
       <input
         ref={fileInputRef}
@@ -62,20 +70,30 @@ const UploadForm = () => {
       <button
         type="button"
         onClick={triggerFileInput}
-        className="text-muted-foreground cursor-pointer hover:text-primary transition-colors"
-        title="Upload PDF"
+        className="flex items-center gap-2 px-3 py-2 w-full sm:w-auto bg-muted border border-border rounded-md text-muted-foreground hover:border-primary transition-all cursor-pointer"
       >
-        <UploadCloud className="w-8 h-8" />
+        <UploadCloud className="w-5 h-5" />
+        <span className="text-sm truncate max-w-[200px] sm:max-w-[240px]">
+          {file ? file.name : 'No file chosen'}
+        </span>
+        {file && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClearFile();
+            }}
+            className="ml-auto text-red-500 hover:text-red-700 cursor-pointer"
+            title="Remove file"
+          >
+            <X className="w-4 h-4" />
+          </span>
+        )}
       </button>
-
-      <span className="text-sm text-muted-foreground max-w-[240px] truncate">
-        {file ? file.name : 'No file chosen'}
-      </span>
 
       <Button
         type="submit"
         disabled={!file || isUploading}
-        className="ml-auto bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full sm:w-auto bg-primary transition disabled:opacity-50"
       >
         {isUploading ? 'Uploading...' : 'Submit'}
       </Button>

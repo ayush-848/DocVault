@@ -4,17 +4,17 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const {
   uploadDocument,
   getDocumentsAndUsage,
-  serveDocument, // This is your proxy function
+  serveDocument,
+  deleteDocument
 } = require('../controllers/documentController');
 
 const multer = require('multer');
 const upload = multer();
 
-// Upload
+
 router.post('/upload', authMiddleware, upload.single('file'), uploadDocument);
-
-// List documents + usage
 router.get('/', authMiddleware, getDocumentsAndUsage);
-
 router.get('/:id/view', authMiddleware, serveDocument);
+router.delete('/:id', authMiddleware, deleteDocument);
+
 module.exports = router;
