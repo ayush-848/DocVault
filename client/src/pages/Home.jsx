@@ -6,13 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import {
-  FileText,
-  LockKeyhole,
-  Sparkles,
-  Sun,
-  Moon,
-} from 'lucide-react'
+import { ShieldCheck, FileText, UploadCloud } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Navbar from '@/components/Navbar'
 
@@ -30,11 +24,12 @@ export default function Home() {
 
   if (!mounted) return null
 
-  const borderColor = theme === 'light' ? 'border-emerald-700' : 'border-emerald-300'
+  const borderColor =
+    theme === 'light' ? 'border-emerald-700' : 'border-emerald-300'
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden font-mono transition-colors duration-300">
-      {/* Glow Effects */}
+      {/* Background glow */}
       <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-primary opacity-10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-primary opacity-10 rounded-full blur-2xl" />
 
@@ -44,63 +39,60 @@ export default function Home() {
       {/* Hero Section */}
       <header className="relative z-10 text-center px-6 py-24 max-w-5xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 font-heading">
-          <span className="text-primary">Effortless Document</span>
+          <span className="text-primary">Store & Access</span>
           <br />
-          <span className="text-foreground">Storage & Organization</span>
+          <span className="text-foreground">Your PDFs Seamlessly</span>
         </h1>
         <p className="text-lg text-muted-foreground mb-12 leading-relaxed max-w-2xl mx-auto">
-          Upload and organize your files securely with our clean interface. DocuFlow helps you stay focused, without the clutter.
+          DocuFlow lets you upload and manage your PDF documents privately and efficiently, with clean UI and simple access.
         </p>
 
-        {/* Upload Box */}
+        {/* Upload CTA Box */}
         <div
-          className={`max-w-2xl mx-auto mb-10 bg-muted/30 backdrop-blur-md rounded-xl p-10 shadow-xl hover:shadow-primary/10 transition ${borderColor} border`}
+          className={`max-w-2xl mx-auto mb-8 bg-muted/30 backdrop-blur-md rounded-xl p-10 shadow-xl hover:shadow-primary/10 transition border ${borderColor}`}
         >
-          <div className="border-2 border-dashed border-primary/60 bg-background/30 backdrop-blur-sm rounded-lg p-6 text-muted-foreground hover:bg-muted/30 transition cursor-pointer">
-            <p className="mb-2">📄 Drag & drop your document here</p>
-            <p className="text-sm text-muted-foreground">or click below to get started</p>
+          <div className="flex flex-col items-center space-y-4">
+            <UploadCloud className="w-10 h-10 text-primary" />
+            <p className="text-muted-foreground font-mono text-sm">
+              Ready to get started?
+            </p>
+            <Button
+              className="w-full bg-primary hover:bg-accent text-black font-semibold py-3 rounded-md"
+              onClick={() => navigate('/signup')}
+            >
+              Upload Your First PDF
+            </Button>
           </div>
-          <Button
-            className="mt-6 w-full bg-primary hover:bg-accent text-black font-semibold py-3 rounded-md"
-            onClick={() => navigate('/signup')}
-          >
-            Upload Your First File
-          </Button>
         </div>
 
-        {/* Supported Formats */}
-        <div className="flex justify-center gap-3 mt-4">
-          {['PDF', 'DOCX', 'TXT', 'CSV'].map((format) => (
-            <span
-              key={format}
-              className="px-3 py-1 text-sm border border-primary text-primary rounded-md bg-muted/30 font-mono"
-            >
-              {format}
-            </span>
-          ))}
+        {/* Format Support Banner */}
+        <div className="mt-4 flex justify-center">
+          <div className="bg-primary/10 text-primary font-semibold px-4 py-2 rounded-md border border-primary/30 font-mono text-sm">
+            📄 Currently supports PDF files only
+          </div>
         </div>
       </header>
 
-      {/* Features */}
+      {/* Features Section */}
       <section className="relative z-10 max-w-6xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-3 gap-8">
           <FeatureCard
             theme={theme}
-            icon={<Sparkles className="text-primary w-8 h-8" />}
-            title="Smart Tagging"
-            content="Quickly label and tag documents for easy categorization and retrieval."
+            icon={<FileText className="text-blue-500 w-8 h-8" />}
+            title="PDF Upload"
+            content="Easily upload PDF files to your secure dashboard and access them anytime."
           />
           <FeatureCard
             theme={theme}
-            icon={<FileText className="text-cyan-400 w-8 h-8" />}
-            title="Flexible Format Support"
-            content="Upload PDFs, Word files, plain text, and more — no conversions needed."
+            icon={<ShieldCheck className="text-green-500 w-8 h-8" />}
+            title="Private Access"
+            content="Only you can view and manage your documents — all content is protected and user-isolated."
           />
           <FeatureCard
             theme={theme}
-            icon={<LockKeyhole className="text-red-400 w-8 h-8" />}
-            title="Private & Secure"
-            content="Your files stay encrypted and accessible only by you — always."
+            icon={<UploadCloud className="text-purple-500 w-8 h-8" />}
+            title="Simple Interface"
+            content="No clutter. Just a clean, distraction-free UI to upload, view, and delete your PDFs."
           />
         </div>
       </section>
@@ -108,7 +100,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="relative z-10 text-center py-12 border-t border-border">
         <p className="text-muted-foreground font-mono">
-          Already using DocuFlow?{' '}
+          Already have an account?{' '}
           <button
             onClick={() => navigate('/login')}
             className="text-primary hover:underline font-medium cursor-pointer"
