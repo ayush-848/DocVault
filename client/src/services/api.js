@@ -30,7 +30,6 @@ export const uploadDoc = (formData) =>
     },
   }).then((res) => res.data);
 
-
 export const getAllDocs = () =>
   API.get('/documents')
     .then((res) => res.data)
@@ -48,12 +47,6 @@ export const analyzeDoc = (docId) =>
 export const addTag = (docId, tag) =>
   API.post(`/tags/${docId}/add`, { tag });
 
-export const createShareLink = (docId) =>
-  API.post(`/share/${docId}`);
-
-export const getSharedDoc = (token) =>
-  API.get(`/share/view/${token}`);
-
 export const deleteDoc = (docId) =>
   API.delete(`/documents/${docId}`)
     .then((res) => res.data)
@@ -62,6 +55,13 @@ export const deleteDoc = (docId) =>
       throw err;
     });
 
+// ✅ NEW: Permanent share link
+export const createShareLink = (docId) =>
+  API.post(`/documents/${docId}/share`).then((res) => res.data);
+
+// ✅ NEW: View shared document
+export const getSharedDoc = (shareId) =>
+  API.get(`documents/share/${shareId}`).then((res) => res.data);
 
 export default {
   register,
@@ -72,7 +72,7 @@ export default {
   getDocViewUrl,
   analyzeDoc,
   addTag,
+  deleteDoc,
   createShareLink,
   getSharedDoc,
-  deleteDoc
 };

@@ -11,6 +11,7 @@ import Upload from './pages/Upload'
 import Document from './pages/Document'
 import Layout from './components/Layout'
 import PrivateRoute from './components/PrivateRoute'
+import SharedViewer from './components/SharedViewer'
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/share/:shareId" element={<SharedViewer />} />
 
           {/* Private routes wrapped in Layout */}
           <Route element={<PrivateRoute><Layout /></PrivateRoute>}>

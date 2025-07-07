@@ -1,40 +1,41 @@
-import { useCallback } from 'react'
-import { Trash2 } from 'lucide-react'
-import DeleteConfirmDialog from './DeleteConfirmDialog'
+import { useCallback } from 'react';
+import { Trash2, Share2 } from 'lucide-react';
+import DeleteConfirmDialog from './DeleteConfirmDialog';
+import ShareDialog from './ShareDialog';
 
 export default function DocCard({ doc, onView, onDelete }) {
   const getThumioThumbnail = useCallback(() => {
     if (doc?.publicUrl?.endsWith('.pdf')) {
-      const encodedUrl = doc.publicUrl
-      return `https://image.thum.io/get/pdfSource/width/400/page/1/${encodedUrl}`
+      const encodedUrl = doc.publicUrl;
+      return `https://image.thum.io/get/pdfSource/width/400/page/1/${encodedUrl}`;
     }
-    return null
-  }, [doc])
+    return null;
+  }, [doc]);
 
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr)
+    const date = new Date(dateStr);
     return date.toLocaleDateString('en-IN', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-    })
-  }
+    });
+  };
 
   const parseTitle = (title) => {
     try {
-      const len = title.length
-      return len > 25 ? `${title.slice(0, 22)}...` : title
+      const len = title.length;
+      return len > 25 ? `${title.slice(0, 22)}...` : title;
     } catch {
-      return 'Unknown'
+      return 'Unknown';
     }
-  }
+  };
 
   const formatSize = (bytes) => {
-    const mb = bytes / (1024 * 1024)
-    return `${mb.toFixed(2)} MB`
-  }
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(2)} MB`;
+  };
 
-  const thumbnail = getThumioThumbnail()
+  const thumbnail = getThumioThumbnail();
 
   return (
     <div className="bg-card p-4 border rounded-lg shadow-sm space-y-2 font-mono relative">
@@ -64,6 +65,18 @@ export default function DocCard({ doc, onView, onDelete }) {
           View
         </span>
 
+        <ShareDialog
+          docId={doc.id}
+          trigger={
+            <span
+              className="text-emerald-500 hover:text-emerald-600 cursor-pointer"
+              title="Share Document"
+            >
+              <Share2 size={16} />
+            </span>
+          }
+        />
+
         <DeleteConfirmDialog onConfirm={() => onDelete(doc.id)}>
           <span
             className="text-red-500 hover:text-red-600 cursor-pointer"
@@ -74,5 +87,5 @@ export default function DocCard({ doc, onView, onDelete }) {
         </DeleteConfirmDialog>
       </div>
     </div>
-  )
+  );
 }

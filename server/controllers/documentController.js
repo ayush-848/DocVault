@@ -180,3 +180,104 @@ exports.deleteDocument = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to delete document', error: err.message });
   }
 };
+
+// 🔗 Generate or retrieve permanent share link
+exports.createShareLink = async (req, res) => {
+  const userId = req.user.id;
+  const docId = req.params.id;
+
+  try {
+    // Check if document belongs to user
+    const result = await pool.query(
+      'SELECT id FROM documents WHERE id = $1 AND user_id = $2',
+      [docId, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Document not found or unauthorized' });
+    }
+
+    // Check if share link already exists
+    const existingLink = await pool.query(
+      'SELECT share_id FROM share_links WHERE user_id = $1 AND document_id = $2',
+      [userId, docId]
+    );
+
+    let shareId;
+    if (existingLink.rows.length > 0) {
+      // ✅ Use existing share ID
+      shareId = existingLink.rows[0].share_id;
+    } else {
+      // 🆕 Create a new share link
+      shareId = uuidv4();
+      await pool.query(
+        `INSERT INTO share_links (user_id, document_id, share_id)
+         VALUES ($1, $2, $3)`,
+        [userId, docId, shareId]
+      );
+    }
+
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const shareUrl = `${baseUrl}/share/${shareId}`;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Share link ready',
+      shareUrl,
+    });
+  } catch (err) {
+    console.error('🔥 createShareLink error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to create share link' });
+  }
+};
+
+
+// 🌐 Serve shared document (public access)
+exports.getDocumentByShareId = async (req, res) => {
+  const { shareId } = req.params;
+  console.log('🌍 Accessing shared document with shareId:', shareId);
+
+  try {
+    const result = await pool.query(
+      `SELECT d.title, d.supabase_key
+       FROM share_links s
+       JOIN documents d ON s.document_id = d.id
+       WHERE s.share_id = $1`,
+      [shareId]
+    );
+
+    if (result.rows.length === 0) {
+      console.log('🚫 No shared document found for shareId:', shareId);
+      return res.status(404).json({ success: false, message: 'Shared document not found' });
+    }
+
+    const { supabase_key, title } = result.rows[0];
+    console.log('📄 Shared document found:', { title, supabase_key });
+
+    const { data } = supabase
+      .storage
+      .from(process.env.SUPABASE_BUCKET)
+      .getPublicUrl(supabase_key);
+
+    if (!data?.publicUrl) {
+      console.log('🚫 Failed to generate public URL from Supabase for:', supabase_key);
+      return res.status(500).json({ success: false, message: 'Could not generate file link' });
+    }
+
+    const fileResponse = await fetch(data.publicUrl);
+    if (!fileResponse.ok) {
+      console.log('🚫 File fetch failed from Supabase URL');
+      return res.status(502).json({ success: false, message: 'Failed to fetch file from storage' });
+    }
+
+    console.log('✅ Streaming shared document:', title);
+    res.setHeader('Content-Type', fileResponse.headers.get('content-type') || 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(title)}"`);
+
+    const stream = Readable.fromWeb(fileResponse.body);
+    stream.pipe(res);
+  } catch (err) {
+    console.error('🔥 getDocumentByShareId error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to serve shared document' });
+  }
+};
