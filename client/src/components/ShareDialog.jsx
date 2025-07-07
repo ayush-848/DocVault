@@ -9,30 +9,30 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
 import { createShareLink } from '@/services/api';
 
 export default function ShareDialog({ docId, trigger }) {
   const [link, setLink] = useState('');
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleOpen = async () => {
     if (!link) {
       try {
         const generated = await createShareLink(docId);
-        console.log('🔗 Share link:', generated); // for debugging
-        setLink(generated.shareUrl || ''); // ensure only string is used
+        setLink(generated.shareUrl || '');
       } catch (err) {
-        console.error('❌ Share link error:', err);
-        toast.error('Failed to generate share link');
+        setLink('Failed to generate link');
       }
     }
     setOpen(true);
   };
 
   const copyToClipboard = () => {
+    if (!link) return;
     navigator.clipboard.writeText(link);
-    toast.success('Link copied to clipboard');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 5000);
   };
 
   return (
@@ -49,8 +49,14 @@ export default function ShareDialog({ docId, trigger }) {
         </DialogHeader>
         <div className="flex items-center space-x-2 mt-4">
           <Input readOnly value={link} className="flex-1" />
-          <Button type="button" onClick={copyToClipboard}>
-            Copy
+          <Button
+            type="button"
+            onClick={copyToClipboard}
+            className={`transition-colors duration-300 ${
+              copied ? 'bg-muted text-muted-foreground' : 'cursor-pointer'
+            }`}
+          >
+            {copied ? 'Copied' : 'Copy'}
           </Button>
         </div>
       </DialogContent>

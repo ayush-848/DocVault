@@ -59,10 +59,6 @@ export const deleteDoc = (docId) =>
 export const createShareLink = (docId) =>
   API.post(`/documents/${docId}/share`).then((res) => res.data);
 
-// ✅ NEW: View shared document
-export const getSharedDoc = (shareId) =>
-  API.get(`documents/share/${shareId}`).then((res) => res.data);
-
 export default {
   register,
   login,
@@ -74,5 +70,4 @@ export default {
   addTag,
   deleteDoc,
   createShareLink,
-  getSharedDoc,
 };
