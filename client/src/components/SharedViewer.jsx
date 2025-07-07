@@ -6,18 +6,18 @@ export default function SharedViewer() {
   const [pdfUrl, setPdfUrl] = useState('');
 
   useEffect(() => {
-    const fetchSharedDoc = async () => {
-      try {
-          const fileUrl = `${import.meta.env.VITE_API_URL}/documents/share/${shareId}`;
-          setPdfUrl(fileUrl);
-        
-      } catch (error) {
-        console.error('Failed to load shared document:', error);
-      }
-    };
+  const openPDF = async () => {
+    try {
+      const fileUrl = `${import.meta.env.VITE_API_URL}/documents/share/${shareId}`;
+        window.open(fileUrl,'_blank')
+      setPdfUrl(fileUrl);
+    } catch (err) {
+      console.error('Redirect failed:', err);
+    }
+  };
 
-    fetchSharedDoc();
-  }, [shareId]);
+  openPDF();
+}, [shareId]);
 
   if (!pdfUrl) return <div className="text-center mt-10">Loading...</div>;
 
