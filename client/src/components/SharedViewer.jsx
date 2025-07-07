@@ -9,7 +9,7 @@ export default function SharedViewer() {
   const openPDF = async () => {
     try {
       const fileUrl = `${import.meta.env.VITE_API_URL}/documents/share/${shareId}`;
-        window.open(fileUrl,'_blank')
+        window.location.href = fileUrl; // Or use window.open(fileUrl, '_blank');
       setPdfUrl(fileUrl);
     } catch (err) {
       console.error('Redirect failed:', err);
