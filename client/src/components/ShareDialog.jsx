@@ -48,12 +48,12 @@ export default function ShareDialog({ docId, trigger }) {
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center space-x-2 mt-4">
-          <Input readOnly value={link} className="flex-1" />
+          <input readOnly value={link} className="bg-zinc-400 dark:bg-zinc-900 text-gray-700 dark:text-secondary px-3 py-2 rounded-md text-sm overflow-x-auto whitespace-nowrap flex-1 border border-border" />
           <Button
             type="button"
             onClick={copyToClipboard}
-            className={`transition-colors duration-300 ${
-              copied ? 'bg-muted text-muted-foreground' : 'cursor-pointer'
+            className={`${
+              copied ? '' : 'cursor-pointer'
             }`}
           >
             {copied ? 'Copied' : 'Copy'}
