@@ -86,11 +86,12 @@ exports.login = async (req, res) => {
     const token = generateToken(userWithoutPassword);
 
     res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',  // true only in prod
+  sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Lax for dev
+  maxAge: 24 * 60 * 60 * 1000,
+});
+
 
     console.log('✅ Login successful for:', userWithoutPassword.username);
 
