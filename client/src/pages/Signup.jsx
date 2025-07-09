@@ -81,9 +81,23 @@ export default function Signup() {
               </button>
             </div>
 
-            <Button type="submit" className="w-full cursor-pointer text-gray-200 dark:text-black" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer text-gray-200 dark:text-black"
+              disabled={loading}
+            >
               {loading ? 'Registering...' : 'Register'}
             </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <span
+                className=" cursor-pointer text-primary"
+                onClick={() => navigate('/login')}
+              >
+                Log in
+              </span>
+            </p>
           </form>
         </Card>
       </div>

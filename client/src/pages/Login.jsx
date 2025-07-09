@@ -20,28 +20,27 @@ export default function Login() {
   const { setTheme, theme } = useTheme();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    const { success, message } = await login({ email, password });
-    setTimeout(() => {
-      if (success) {
-        toast.success(`✅ ${message}`);
-        navigate('/dashboard');
-      } else {
-        toast.error(`❌ ${message}`);
-      }
-      setLoading(false);
-    }, 2000);
-  } catch (err) {
-    console.error(err);
-    setTimeout(() => {
-      toast.error(`${err.message || '⚠️ Something went wrong during login.'}`);
-      setLoading(false);
-    }, 2000);
-  }
-};
-
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { success, message } = await login({ email, password });
+      setTimeout(() => {
+        if (success) {
+          toast.success(`✅ ${message}`);
+          navigate('/dashboard');
+        } else {
+          toast.error(`❌ ${message}`);
+        }
+        setLoading(false);
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setTimeout(() => {
+        toast.error(`${err.message || '⚠️ Something went wrong during login.'}`);
+        setLoading(false);
+      }, 2000);
+    }
+  };
 
   return (
     <>
@@ -79,6 +78,16 @@ export default function Login() {
             <Button type="submit" className="w-full cursor-pointer text-gray-200 dark:text-black" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Don&apos;t have an account?{' '}
+              <span
+                className="cursor-pointer text-primary"
+                onClick={() => navigate('/signup')}
+              >
+                Sign up
+              </span>
+            </p>
           </form>
         </Card>
       </div>
