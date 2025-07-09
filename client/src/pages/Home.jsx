@@ -60,7 +60,7 @@ export default function Home() {
               Ready to get started?
             </p>
             <Button
-              className="w-full bg-primary hover:bg-accent text-black font-semibold py-3 rounded-md"
+              className="w-full bg-primary cursor-pointer text-black font-semibold py-3 rounded-md"
               onClick={() => navigate('/signup')}
             >
               Upload Your First PDF

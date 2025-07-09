@@ -84,8 +84,8 @@ export default function Dashboard() {
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-mono">
           Welcome{user?.username ? `, ${user.username}` : ''} 👋
         </h1>
-        <p className="text-muted-foreground text-sm mt-1 font-mono">
-          Manage and analyze your documents efficiently.
+        <p className="text-muted-foreground text-md mt-1 font-mono">
+          Manage your documents efficiently.
         </p>
       </div>
 
@@ -109,7 +109,7 @@ export default function Dashboard() {
 
       {/* Documents */}
       <div>
-        <h2 className="text-xl font-semibold mb-4 font-mono">Your Documents</h2>
+        <h2 className="text-xl font-semibold mb-4 font-mono">Your Recent Documents</h2>
 
         {loading ? (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -123,14 +123,15 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {docs.map((doc) => (
-              <DocCard
-                key={doc.id}
-                doc={doc}
-                onView={openDocument}
-                onDelete={deleteDocument}
-              />
-            ))}
+            {docs.slice(0, 3).map((doc) => (
+  <DocCard
+    key={doc.id}
+    doc={doc}
+    onView={openDocument}
+    onDelete={deleteDocument}
+  />
+))}
+
           </div>
         )}
       </div>

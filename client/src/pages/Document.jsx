@@ -1,68 +1,99 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import api from '@/services/api'
+import { useEffect, useState } from 'react';
+import api from '../services/api';
+import DocCard from '../components/DocCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import toast from '@/utils/toast';
 
 export default function Document() {
-  const { id } = useParams()
-  const [doc, setDoc] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [analyzing, setAnalyzing] = useState(false)
-  const [error, setError] = useState(null)
+  const [docs, setDocs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAllDocs = async () => {
+    try {
+      setLoading(true);
+      const { documents } = await api.getAllDocs();
+      setDocs(documents || []);
+    } catch (err) {
+      toast.error('❌ Failed to fetch documents.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDoc = async () => {
-      try {
-        const res = await api.getCurrentUser()
-        const allDocs = res.data?.user?.documents || []
-        const current = allDocs.find(d => d.id === id)
-        if (!current) throw new Error('Document not found')
-        setDoc(current)
-      } catch (err) {
-        setError('❌ Failed to load document')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchDoc()
-  }, [id])
+    fetchAllDocs();
+  }, []);
 
-  const handleAnalyze = async () => {
-    try {
-      setAnalyzing(true)
-      const res = await api.analyzeDoc(id)
-      setDoc(res.data.document)
-    } catch (err) {
-      setError('❌ Analysis failed')
-    } finally {
-      setAnalyzing(false)
-    }
-  }
-
-  if (loading) return <p className="text-muted">Loading...</p>
-  if (error) return <p className="text-red-500">{error}</p>
-
-  return (
-    <div className="max-w-3xl mx-auto p-6">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">{doc.title}</h1>
-        {doc.language && (
-          <Badge className="mt-2">{doc.language.toUpperCase()}</Badge>
-        )}
-      </div>
-
-      <div className="flex gap-4 mb-6">
-        <Button onClick={handleAnalyze} disabled={analyzing}>
-          {analyzing ? 'Analyzing...' : 'Detect Language'}
-        </Button>
-        <Button variant="outline">Add Tags</Button>
-        <Button variant="secondary">Create Share Link</Button>
-      </div>
-
-      <div className="text-sm text-muted-foreground">
-        📦 Stored as: <code>{doc.supabase_key}</code>
+  const SkeletonCard = () => (
+    <div className="rounded-lg border border-border p-4 space-y-4">
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-32 w-full rounded-md" />
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-1/2 rounded-md" />
+        <Skeleton className="h-8 w-1/2 rounded-md" />
       </div>
     </div>
-  )
+  );
+
+  const openDocument = async (docId) => {
+    try {
+      const res = await fetch(api.getDocViewUrl(docId), {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to fetch document');
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.location.href = url;
+    } catch (err) {
+      toast.error('❌ Unable to open document. Please try again.');
+    }
+  };
+
+  const deleteDocument = async (docId) => {
+    try {
+      await api.deleteDoc(docId);
+      await fetchAllDocs();
+      toast.success('✅ Document deleted successfully!');
+    } catch (err) {
+      toast.error('❌ Failed to delete document. Please try again.');
+    }
+  };
+
+  return (
+    <div className="p-4 sm:p-6 space-y-8 min-h-screen">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-mono">
+          All Documents
+        </h1>
+        <p className="text-muted-foreground text-md mt-1 font-mono">
+          Browse all uploaded documents by you.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, idx) => (
+            <SkeletonCard key={idx} />
+          ))}
+        </div>
+      ) : docs.length === 0 ? (
+        <div className="text-muted-foreground italic text-center py-10 font-mono">
+          No documents available.
+        </div>
+      ) : (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {docs.map((doc) => (
+            <DocCard
+              key={doc.id}
+              doc={doc}
+              onView={openDocument}
+              onDelete={deleteDocument}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
