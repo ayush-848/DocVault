@@ -1,55 +1,32 @@
 // src/pages/Upload.jsx
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import api from '../services/api';
+import UploadForm from '../components/UploadForm';
+import { useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import toast from '@/utils/toast';
 
 export default function Upload() {
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState('');
+  const { user } = useAuth();
 
-  const handleUpload = async e => {
-    e.preventDefault();
-    if (!file) return;
-
-    setUploading(true);
-    setMessage('');
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await api.post('/documents/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      setMessage(`✅ Uploaded: ${res.data.document.title}`);
-    } catch (err) {
-      setMessage('❌ Upload failed');
-    } finally {
-      setUploading(false);
-      setFile(null);
+  useEffect(() => {
+    if (!user) {
+      toast.error('⚠️ Please log in to upload documents.');
+      window.location.href = '/login';
     }
-  };
+  }, [user]);
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">📤 Upload a Document</h2>
-      <form onSubmit={handleUpload} className="space-y-4">
-        <Input
-          type="file"
-          accept=".pdf,.doc,.docx,.txt"
-          onChange={e => setFile(e.target.files[0])}
-        />
-        <Button type="submit" disabled={uploading || !file}>
-          {uploading ? 'Uploading...' : 'Upload'}
-        </Button>
-      </form>
+    <div className="p-4 sm:p-6 mx-auto space-y-6">
+      <h1 className="text-2xl sm:text-3xl font-bold font-mono">📤 Upload Document</h1>
+      <p className="text-muted-foreground text-sm font-mono">
+        Select a PDF file to upload to your library.
+      </p>
 
-      {message && <p className="mt-4 text-sm">{message}</p>}
+      <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+        <UploadForm onDone={() => {
+          toast.success('✅ Document uploaded successfully!');
+          window.location.href = '/dashboard';
+        }} />
+      </div>
     </div>
   );
 }
