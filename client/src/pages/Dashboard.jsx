@@ -60,7 +60,6 @@ export default function Dashboard() {
       await fetchDocs();
       toast.success('✅ Document deleted successfully!');
     } catch (err) {
-      console.error('❌ Failed to delete document:', err);
       toast.error('❌ Failed to delete document. Please try again.');
     }
   };
@@ -91,11 +90,11 @@ export default function Dashboard() {
       {/* Storage Usage */}
       <div className="bg-card border border-border shadow-md rounded-xl p-6 space-y-4">
         <h2 className="text-xl font-semibold">Storage Usage</h2>
-        <div className="flex justify-between text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row justify-between gap-1 text-sm text-muted-foreground">
           <span>
-            {storage.usedMB} MB of {storage.maxMB} MB used ({storage.usagePercent}%)
+            {storage.usedMB} MB of {storage.maxMB} MB used
           </span>
-          <span>{storage.remainingMB} MB left</span>
+          <span className="hidden sm:inline">{storage.remainingMB} MB left</span>
         </div>
         <Progress value={storage.usagePercent} className="h-3 rounded-full" />
       </div>
@@ -105,7 +104,8 @@ export default function Dashboard() {
         <a
           href="/upload"
           className="inline-block bg-[#539d89] dark:bg-[#1b765e] text-black dark:text-white font-semibold py-3 px-6 rounded-md transition duration-200"
-        >Upload New PDF
+        >
+          Upload New PDF
         </a>
       </div>
 

@@ -39,13 +39,10 @@ const UploadForm = ({ onDone }) => {
       formData.append('language', langCode);
 
       const res = await uploadDoc(formData);
-      console.log('✅ Uploaded Document:', res);
-
       toast.success('✅ Document uploaded successfully!');
       handleClearFile();
       if (onDone) onDone();
     } catch (err) {
-      console.error('❌ Upload failed:', err);
       toast.error('❌ Upload failed. Please try again.');
     } finally {
       setIsUploading(false);

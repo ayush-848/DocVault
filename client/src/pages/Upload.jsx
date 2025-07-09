@@ -22,10 +22,7 @@ export default function Upload() {
       </p>
 
       <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-        <UploadForm onDone={() => {
-          toast.success('✅ Document uploaded successfully!');
-          window.location.href = '/dashboard';
-        }} />
+        <UploadForm  />
       </div>
     </div>
   );
