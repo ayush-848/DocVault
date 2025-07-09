@@ -40,7 +40,7 @@ export default function Home() {
       <Navbar setTheme={setTheme} theme={theme} />
 
       {/* Hero Section */}
-      <header className="relative z-10 text-center px-4 sm:px-6 py-20 sm:py-24 max-w-5xl mx-auto">
+      <header id='about' className="relative z-10 text-center px-4 sm:px-6 py-20 sm:py-24 max-w-5xl mx-auto">
         <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-6 font-heading">
           <span className="text-primary">Store & Access</span>
           <br />
@@ -77,7 +77,7 @@ export default function Home() {
       </header>
 
       {/* Features Section */}
-      <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <section id='features' className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
           <FeatureCard
             theme={theme}

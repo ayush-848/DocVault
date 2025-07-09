@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sun, Moon, AlignLeft, Menu, X } from 'lucide-react';
+import { HashLink } from 'react-router-hash-link';
+import { useNavigate } from 'react-router-dom';
 
 export default function Navbar({ theme, setTheme }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const navigate = (path) => {
+  const handleNavigate = (path) => {
     window.location.href = path;
     setIsMobileMenuOpen(false);
   };
@@ -26,9 +29,15 @@ export default function Navbar({ theme, setTheme }) {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8 text-muted-foreground">
-          <button className="text-primary cursor-pointer">Features</button>
-          <button className="text-primary cursor-pointer" onClick={() => navigate('/dashboard')}>Dashboard</button>
-          <button className="text-primary cursor-pointer">About</button>
+          <HashLink smooth to="/#features" className="text-primary cursor-pointer">
+            Features
+          </HashLink>
+          <button className="text-primary cursor-pointer" onClick={() => navigate('/dashboard')}>
+            Dashboard
+          </button>
+          <HashLink smooth to="/#about" className="text-primary cursor-pointer">
+            About
+          </HashLink>
         </div>
 
         {/* Desktop Actions */}
@@ -76,9 +85,25 @@ export default function Navbar({ theme, setTheme }) {
 
             {/* Menu Items */}
             <div className="flex flex-col items-center gap-6 text-xl font-mono">
-              <button onClick={() => navigate('/')} className="cursor-pointer">Features</button>
-              <button onClick={() => navigate('/dashboard')} className="cursor-pointer">Dashboard</button>
-              <button onClick={() => navigate('/')} className="cursor-pointer">About</button>
+              <HashLink
+                smooth
+                to="/#features"
+                className="cursor-pointer"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Features
+              </HashLink>
+              <button onClick={() => handleNavigate('/dashboard')} className="cursor-pointer">
+                Dashboard
+              </button>
+              <HashLink
+                smooth
+                to="/#about"
+                className="cursor-pointer"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </HashLink>
             </div>
 
             {/* Actions */}
@@ -86,7 +111,7 @@ export default function Navbar({ theme, setTheme }) {
               <ThemeToggle setTheme={setTheme} theme={theme} />
               <Button
                 className="bg-primary text-gray-200 dark:text-black font-semibold text-sm px-6 py-2 mt-2 cursor-pointer"
-                onClick={() => navigate('/signup')}
+                onClick={() => handleNavigate('/signup')}
               >
                 Get Started
               </Button>
